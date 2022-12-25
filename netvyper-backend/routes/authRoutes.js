@@ -1,13 +1,26 @@
 const express = require("express");
 const router = express.Router();
+const authController = require("../controllers/auth/authController");
+const Joi = require("joi");
+const validator = require("express-joi-validation").createValidator({});
 
-router.post("/register", (req, res) => {
-  res.send("register route");
+const registerSchema = Joi.object({
+  username: Joi.string().min(3).max(20).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).max(20).required(),
 });
 
-router.post("/login", (req, res) => {
-  res.send("login route");
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).max(20).required(),
 });
 
+router.post(
+  "/register",
+  validator.body(registerSchema),
+  authController.postRegister
+);
 
-module.exports = router
+router.post("/login", validator.body(loginSchema), authController.postLogin);
+
+module.exports = router;
