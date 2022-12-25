@@ -8,7 +8,17 @@ const postLogin = async (req, res) => {
     const user = await User.findOne({ mail: mail.toLowerCase() });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = "JWT";
+      // create JWT token
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          mail,
+        },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "24h",
+        }
+      );
       res.status(201).json({
         mail: mail,
         token: token,
